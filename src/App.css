@@ -8,3 +8,17 @@
   margin: 6px;
   padding: 8px;
 };
+
+.news-image {
+  /* width: 300px; */
+}
+
+.news-title {
+  color: blue;
+  margin-left: 20px;
+}
+
+.news-wrapper {
+  display: flex;
+  padding: 20px;
+}

@@ -1,53 +1,41 @@
 import React, { Component } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+// import InfiniteScroll from "react-infinite-scroll-component";
+import NewsComponent from "./NewsComponent";
 
 class InfiniteScrolling extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      newz: '',
-      items: Array.from({ length: 30 })
+      newz: [],
     };
   }
 
-  fetchMoreData = () => {
-    setTimeout(() => {
-      this.setState({
-        items: this.state.items.concat(Array.from({ length: 20 }))
-      });
-    }, 1500);
-  };
-
   fetchnews = () => {
-    fetch('https://newsapi.org/v2/top-headlines?country=us&apiKey=3f17372c08b14d96b3f09d565d31aec7')
-    .then(res => res.json())
-    .then(data => {
-      this.setState({newz: data});
-    });
-  }
+    fetch(
+      "https://newsapi.org/v2/top-headlines?country=us&apiKey=3f17372c08b14d96b3f09d565d31aec7"
+    )
+      .then(res => res.json())
+      .then(data => {
+        this.setState({ newz: data.articles });
+      });
+  };
 
   componentDidMount() {
     this.fetchnews();
   }
 
   render() {
+    console.log(this.state.newz)
     return (
       <div>
-        <h1>demo: react-infinite-scroll-component</h1>
+        <h1>Daily News</h1>
         <hr />
-        <InfiniteScroll
-          dataLength={this.state.items.length}
-          next={this.fetchMoreData}
-          hasMore={true}
-          loader={<h4>Loading...</h4>}
-        >
-          {this.state.items.map((i, index) => (
-            <div className='style' key={index}>
-              div - #{index}
-            </div>
+        <div className='news-container'>
+          {this.state.newz.map((item, index) => (
+            <NewsComponent key={index} {...item} />
           ))}
-        </InfiniteScroll>
+        </div>
       </div>
     );
   }
