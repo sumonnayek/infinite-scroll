@@ -20,5 +20,17 @@
 
 .news-wrapper {
   display: flex;
-  padding: 20px;
+  padding: 0 20px;
+}
+
+.top-button {
+  position: fixed;
+  float: right;
+  right: 10px;
+  top: 10px;
+  font-size: 40px;
+  border-radius: 50;
+  border-radius: 50%;
+  border: none;
+  width: 50px;
 }
