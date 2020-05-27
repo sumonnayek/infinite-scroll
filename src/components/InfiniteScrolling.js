@@ -23,49 +23,64 @@ class InfiniteScrolling extends Component {
         }));
         setTimeout(() => {
           this.setState({
-            posts: [...this.state.posts, ...nextPosts],
+            posts: [...nextPosts, ...this.state.posts],
             loading: false
           });
         }, 800);
       });
   };
 
-  // onClick = () => {
-  //   this.fetchPosts();
-  // };
+  toBottom = () => {
+    let a = document.getElementById("mainDiv").scrollHeight ;
+    // window.scrollTo(0, a)
+    window.scrollY = document.getElementById("mainDiv").scrollHeight - window.innerHeight;
+    // document.getElementById("mainDiv").scrollTop = document.getElementById("mainDiv").scrollHeight ;
+    console.log(`scrollTop ${window.scrollY} scrollHeight ${document.getElementById("mainDiv").scrollHeight}`)
+
+  };
 
   componentDidMount() {
+    
+    // document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
+    // console.log(
+    //   `scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${
+    //     document.querySelector("body").scrollHeight
+    //   }`
+    // );
     this.fetchPosts();
-    
-    
-        
-    window.onscroll = throttle(e => {
-      let totalHeight = window.innerHeight + window.scrollY
-      let minHeight = document.querySelector("body").scrollHeight - totalHeight;
+    // .then(() => {document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
+    // console.log(`scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${document.querySelector("body").scrollHeight}`)})
 
-      console.log(
-        `ScrollHeight: ${
-          document.querySelector("body").scrollHeight
-        } InnerHeight: ${window.innerHeight} scrollTop: ${
-          window.scrollY
-        } totalHeight: ${window.innerHeight + window.scrollY}
-        ${(Math.floor(window.innerHeight + window.scrollY) /
-          document.querySelector("body").scrollHeight) *
-          100} minHeight: ${minHeight}
-        `
-      );
+    // document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
+    // console.log(`scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${document.querySelector("body").scrollHeight}`)
+    //   window.onscroll = throttle(e => {
+    //     // window.scrollY =  document.querySelector("body").scrollHeight - window.innerHeight;
+    //     let totalHeight = window.innerHeight + window.scrollY
+    //     let minHeight = document.querySelector("body").scrollHeight - totalHeight;
 
-      let scrollChangeOn = minHeight < 2000 ? minHeight : 2000;
+    //     console.log(
+    //       `ScrollHeight: ${
+    //         document.querySelector("body").scrollHeight
+    //       } InnerHeight: ${window.innerHeight} scrollTop: ${
+    //         window.scrollY
+    //       } totalHeight: ${window.innerHeight + window.scrollY}
+    //       ${(Math.floor(window.innerHeight + window.scrollY) /
+    //         document.querySelector("body").scrollHeight) *
+    //         100} minHeight: ${minHeight}
+    //       `
+    //     );
 
-      if (
-        document.querySelector("body").scrollHeight -
-          (window.innerHeight + window.scrollY) <=
-        scrollChangeOn
-      ) {
-        console.log("in");
-        !this.state.loading && this.fetchPosts();
-      }
-    }, 500);
+    //     // let scrollChangeOn = minHeight < 2000 ? minHeight : 2000;
+
+    //     // if (
+    //     //   document.querySelector("body").scrollHeight -
+    //     //     (window.innerHeight + window.scrollY) <=
+    //     //   scrollChangeOn
+    //     // ) {
+    //     //   console.log("in");
+    //     //   !this.state.loading && this.fetchPosts();
+    //     // }
+    //   }, 500);
   }
 
   goToTop = () => {
@@ -75,7 +90,8 @@ class InfiniteScrolling extends Component {
   render() {
     // console.log(this.state.posts);
     return (
-      <div>
+      <div id='mainDiv'>
+        <button onClick={this.toBottom}>click</button>
         <h1>Daily Posts</h1>
         <button onClick={this.goToTop} className="top-button">
           ^
@@ -86,7 +102,7 @@ class InfiniteScrolling extends Component {
             <PostComponent key={index} {...item} />
           ))}
         </div>
-        {/* <button onClick={this.onClick}>click</button> */}
+        
       </div>
     );
   }
