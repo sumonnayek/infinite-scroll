@@ -12,85 +12,88 @@ class InfiniteScrolling extends Component {
     };
   }
 
-  fetchPosts = () => {
+  fetchPosts = (callback) => {
+    console.log('inside fetch post');
+
     this.setState({ loading: true });
     fetch("http://localhost:5000/post")
       .then(res => res.json())
       .then(data => {
         // this.setState({ posts: data });
-        const nextPosts = data.map(post => ({
+        const nextPosts = data.reverse().map(post => ({
           ...post
         }));
         setTimeout(() => {
           this.setState({
             posts: [...nextPosts, ...this.state.posts],
             loading: false
+          }, ()=>{
+            console.log( `state updated with new post postLength ${this.state.posts.length}`);
+            if(callback){
+              callback();
+            }
           });
-        }, 800);
+        }, 500);
       });
   };
 
   toBottom = () => {
-    let a = document.getElementById("mainDiv").scrollHeight ;
-    // window.scrollTo(0, a)
-    window.scrollY = document.getElementById("mainDiv").scrollHeight - window.innerHeight;
-    // document.getElementById("mainDiv").scrollTop = document.getElementById("mainDiv").scrollHeight ;
-    console.log(`scrollTop ${window.scrollY} scrollHeight ${document.getElementById("mainDiv").scrollHeight}`)
-
+    document.querySelector("html").scrollTop = document.querySelector("body").scrollHeight;
+    // console.log(
+    //   `scrollTop ${window.scrollY} scrollHeight ${
+    //     document.getElementById("mainDiv").scrollHeight
+    //   }`
+    // );
   };
 
   componentDidMount() {
-    
-    // document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
-    // console.log(
-    //   `scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${
-    //     document.querySelector("body").scrollHeight
-    //   }`
-    // );
-    this.fetchPosts();
-    // .then(() => {document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
-    // console.log(`scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${document.querySelector("body").scrollHeight}`)})
+   
+    this.fetchPosts(this.toBottom);
 
-    // document.querySelector("body").scrollTop = document.querySelector("body").scrollHeight;
-    // console.log(`scrollTop ${document.querySelector("body").scrollTop} scrollHeight ${document.querySelector("body").scrollHeight}`)
-    //   window.onscroll = throttle(e => {
-    //     // window.scrollY =  document.querySelector("body").scrollHeight - window.innerHeight;
-    //     let totalHeight = window.innerHeight + window.scrollY
-    //     let minHeight = document.querySelector("body").scrollHeight - totalHeight;
+      window.onscroll = throttle(e => {
+        // window.scrollY =  document.querySelector("body").scrollHeight - window.innerHeight;
+        let totalHeight = window.innerHeight + window.scrollY
+        let minHeight = document.querySelector("body").scrollHeight - totalHeight;
 
-    //     console.log(
-    //       `ScrollHeight: ${
-    //         document.querySelector("body").scrollHeight
-    //       } InnerHeight: ${window.innerHeight} scrollTop: ${
-    //         window.scrollY
-    //       } totalHeight: ${window.innerHeight + window.scrollY}
-    //       ${(Math.floor(window.innerHeight + window.scrollY) /
-    //         document.querySelector("body").scrollHeight) *
-    //         100} minHeight: ${minHeight}
-    //       `
-    //     );
+       console.info(`window.scrollY ${window.scrollY} loading ${this.state.loading}`)
 
-    //     // let scrollChangeOn = minHeight < 2000 ? minHeight : 2000;
-
-    //     // if (
-    //     //   document.querySelector("body").scrollHeight -
-    //     //     (window.innerHeight + window.scrollY) <=
-    //     //   scrollChangeOn
-    //     // ) {
-    //     //   console.log("in");
-    //     //   !this.state.loading && this.fetchPosts();
-    //     // }
-    //   }, 500);
+        if (
+          window.scrollY <2000
+        ) {
+          console.log("in");
+          !this.state.loading && this.fetchPosts();
+        }
+      }, 500);
   }
 
   goToTop = () => {
     window.scrollTo(0, 0);
   };
 
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    // Are we adding new items to the list?
+    // Capture the scroll position so we can adjust scroll later.
+    if (prevState.posts.length < this.state.posts.length) {
+      // const list = this.listRef.current;
+      return document.querySelector("body").scrollHeight - document.querySelector("html").scrollTop;
+    }
+    return null;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // If we have a snapshot value, we've just added new items.
+    // Adjust scroll so these new items don't push the old ones out of view.
+    // (snapshot here is the value returned from getSnapshotBeforeUpdate)
+    if (snapshot !== null) {
+      // const list = this.listRef.current;
+      document.querySelector("html").scrollTop = document.querySelector("body").scrollHeight - snapshot;
+    }
+  }
+
   render() {
     // console.log(this.state.posts);
     return (
-      <div id='mainDiv'>
+      <div id="mainDiv">
         <button onClick={this.toBottom}>click</button>
         <h1>Daily Posts</h1>
         <button onClick={this.goToTop} className="top-button">
@@ -99,10 +102,9 @@ class InfiniteScrolling extends Component {
         <hr />
         <div className="news-container">
           {this.state.posts.map((item, index) => (
-            <PostComponent key={index} {...item} />
+            <PostComponent key={index} {...item} index={index} />
           ))}
         </div>
-        
       </div>
     );
   }
